@@ -1,4 +1,5 @@
-/* SPDX-License-Identifier: ISC */
+/* SPDX-License-Identifier: BSD-3-Clause-Clear */
+/* Copyright (c) 2026 unstablerobotgf */
 /* /dev/mt7921_sdr: MT7922 IQ streaming. read() returns raw little-endian 32-bit words:
  * I in bits 29:16, Q in bits 13:0, 14-bit two's complement with bits 1:0 always zero. */
 #ifndef __MT7921_SDR_IOCTL_H

@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+// Copyright (c) 2026 unstablerobotgf
 // SoapySDR source for the MT7922 in SDR mode (/dev/mt7921_sdr, mt7921-common sdr=1).
 // Raw words: I in bits 29:16, Q in bits 13:0, 14-bit two's complement, bits 1:0 always zero.
 #include <SoapySDR/Device.hpp>

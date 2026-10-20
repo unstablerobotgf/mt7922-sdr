@@ -1,4 +1,6 @@
 /* SPDX-License-Identifier: MIT */
+/* Copyright (c) 2026 unstablerobotgf */
+/* Portions Copyright (c) 2026 Luigi C. (BirriaSDR) */
 /* MT7922 SDR program: runs on the WF MCU (NDS32) in place of the vendor firmware.
  * Downloaded to ILM 0x0091b000 by the unpatched ROM; talks to the host through a SYSRAM mailbox.
  *

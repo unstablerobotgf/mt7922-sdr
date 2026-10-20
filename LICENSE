@@ -1,0 +1,21 @@
+This project is distributed under more than one licence. Every source file
+names its own licence in an SPDX-License-Identifier line; the full texts are
+in LICENSES/.
+
+  BSD-3-Clause-Clear    the kernel driver (driver/), including the patch to
+                        MediaTek's mt76 driver, whose hunks keep their
+                        original attribution
+  MIT                   everything else: the MCU program and its build script
+                        (firmware/), the SoapySDR module (soapy/), scripts
+                        (tools/) and documentation
+
+Copyright (c) 2026 unstablerobotgf
+
+Portions of driver/ are derived from the Linux mt76 driver:
+  Copyright (C) 2021 MediaTek Inc.
+
+Portions of firmware/ are derived from BirriaSDR
+(https://github.com/luigifcruz/BirriaSDR), used under the MIT licence:
+  Copyright (c) 2026 Luigi C.
+
+The BSD-3-Clause-Clear licence grants no patent rights; see its text.

@@ -1,4 +1,5 @@
-// SPDX-License-Identifier: ISC
+// SPDX-License-Identifier: BSD-3-Clause-Clear
+/* Copyright (c) 2026 unstablerobotgf */
 /* MT7922 SDR mode: module parameter and the sample-event consumer (mt7921-common). */
 
 #include <linux/module.h>

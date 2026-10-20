@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 unstablerobotgf
 # Back to WiFi: unloading mt7921e replays the undo log, then the stock driver and Bluetooth return.
 #   tools/sdr-down.sh      (run as root, with no program holding /dev/mt7921_sdr open)
 set -uo pipefail

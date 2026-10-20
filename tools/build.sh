@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 unstablerobotgf
 # Build mt7921-common.ko and mt7921e.ko with SDR mode, out of tree, against the running kernel.
 #   tools/build.sh MT76_SRC [KDIR]
 # MT76_SRC: drivers/net/wireless/mediatek/mt76 from the source of the running kernel version.

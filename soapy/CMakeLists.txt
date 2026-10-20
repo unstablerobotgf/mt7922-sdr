@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 unstablerobotgf
 cmake_minimum_required(VERSION 3.10)
 project(SoapyMT7922 CXX)
 find_package(SoapySDR CONFIG REQUIRED)

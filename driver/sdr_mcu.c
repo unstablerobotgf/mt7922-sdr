@@ -1,4 +1,6 @@
-// SPDX-License-Identifier: ISC
+// SPDX-License-Identifier: BSD-3-Clause-Clear
+/* Copyright (c) 2026 unstablerobotgf */
+/* Copyright (C) 2021 MediaTek Inc. (boot sequence after mt7921e pci_mcu.c) */
 /* MT7922 SDR mode: boot the SDR program from the ROM, mailbox commands, radio bring-up. */
 
 #include <linux/random.h>

@@ -1,4 +1,5 @@
-/* SPDX-License-Identifier: ISC */
+/* SPDX-License-Identifier: BSD-3-Clause-Clear */
+/* Copyright (c) 2026 unstablerobotgf */
 /* MT7922 SDR mode: state and helpers shared by sdr_mcu.c, sdr_rf.c and sdr_stream.c. */
 #ifndef __MT7921_SDR_INTERNAL_H
 #define __MT7921_SDR_INTERNAL_H

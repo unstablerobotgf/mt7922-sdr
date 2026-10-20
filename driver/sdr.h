@@ -1,4 +1,5 @@
-/* SPDX-License-Identifier: ISC */
+/* SPDX-License-Identifier: BSD-3-Clause-Clear */
+/* Copyright (c) 2026 unstablerobotgf */
 /* MT7922 SDR mode: the interface between mt7921-common and mt7921e. */
 #ifndef __MT7921_SDR_H
 #define __MT7921_SDR_H

@@ -91,6 +91,8 @@ firmware/
 soapy/                 SoapySDR module
 tools/                 build, up/down, end-to-end check
 docs/                  see below
+LICENSE                which licence covers which path
+LICENSES/              full texts: BSD-3-Clause-Clear, MIT
 ```
 
 ## Documentation
@@ -128,6 +130,7 @@ docs/                  see below
 
 ## License
 
-To be decided. The driver files are derived from and link with mt76 (ISC and
-BSD-3-Clause-Clear); the firmware and build script follow BirriaSDR (MIT). SPDX tags in each
-file reflect that until a project license is chosen.
+Copyright (c) 2026 unstablerobotgf. The kernel driver (`driver/`) is BSD-3-Clause-Clear,
+matching the mt76 driver it extends; everything else is MIT. Portions derive from mt76
+(MediaTek) and BirriaSDR (Luigi C.), whose notices are kept. Each file carries an SPDX tag;
+see [LICENSE](LICENSE) and the texts in [LICENSES/](LICENSES/).

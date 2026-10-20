@@ -1,4 +1,5 @@
-// SPDX-License-Identifier: ISC
+// SPDX-License-Identifier: BSD-3-Clause-Clear
+/* Copyright (c) 2026 unstablerobotgf */
 /* MT7922 SDR mode: A-die and PHY state. Every write is logged in an undo log first. */
 
 #include "sdr_internal.h"

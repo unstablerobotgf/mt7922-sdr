@@ -1,4 +1,5 @@
-/* SPDX-License-Identifier: ISC */
+/* SPDX-License-Identifier: BSD-3-Clause-Clear */
+/* Copyright (c) 2026 unstablerobotgf */
 /* Vendor firmware A-die state for 2.4 GHz, read back through the vendor's REG_READ command with a
  * stock driver in monitor mode (tools/chanscan). Port 1 = firmware bank 0, port 0 = bank 1. */
 #ifndef __MT7921_SDR_STOCK_2G_H

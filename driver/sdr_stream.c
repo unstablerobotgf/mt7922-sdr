@@ -1,4 +1,5 @@
-// SPDX-License-Identifier: ISC
+// SPDX-License-Identifier: BSD-3-Clause-Clear
+/* Copyright (c) 2026 unstablerobotgf */
 /* MT7922 SDR mode: /dev/mt7921_sdr and the stream command. */
 
 #include <linux/fs.h>

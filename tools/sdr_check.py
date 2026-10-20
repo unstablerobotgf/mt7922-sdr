@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 unstablerobotgf
 """End-to-end check of /dev/mt7921_sdr: throughput at each rate, live retune, manual and auto
 gain, and 802.11b beacon detection (11-chip Barker, 1 us symbols) as proof of real reception.
 

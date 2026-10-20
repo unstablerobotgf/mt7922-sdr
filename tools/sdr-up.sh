@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 unstablerobotgf
 # Switch the MT7922 from WiFi to SDR mode: Bluetooth off, mt7921e reloaded with sdr=1.
 #   tools/sdr-up.sh [MODULE_DIR]     (default: build/mt76/mt7921; run as root)
 # /dev/mt7921_sdr appears once the radio is up. tools/sdr-down.sh undoes it.
