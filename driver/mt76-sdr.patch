@@ -1,0 +1,84 @@
+--- a/drivers/net/wireless/mediatek/mt76/mt7921/init.c
++++ b/drivers/net/wireless/mediatek/mt76/mt7921/init.c
+@@ -134,6 +134,13 @@
+ 					      init_work);
+ 	int ret;
+ 
++	if (mt7921_sdr) {
++		/* SDR mode: one boot attempt, no retries, no mac80211 */
++		set_bit(MT76_STATE_INITIALIZED, &dev->mphy.state);
++		mt792x_mcu_init(dev);
++		return;
++	}
++
+ 	ret = mt7921_init_hardware(dev);
+ 	if (ret)
+ 		return;
+--- a/drivers/net/wireless/mediatek/mt76/mt7921/Makefile
++++ b/drivers/net/wireless/mediatek/mt76/mt7921/Makefile
+@@ -5,8 +5,8 @@
+ obj-$(CONFIG_MT7921S) += mt7921s.o
+ obj-$(CONFIG_MT7921U) += mt7921u.o
+ 
+-mt7921-common-y := mac.o mcu.o regd.o main.o init.o debugfs.o
++mt7921-common-y := mac.o mcu.o regd.o main.o init.o debugfs.o sdr_rx.o
+ mt7921-common-$(CONFIG_NL80211_TESTMODE) += testmode.o
+-mt7921e-y := pci.o pci_mac.o pci_mcu.o
++mt7921e-y := pci.o pci_mac.o pci_mcu.o sdr_mcu.o sdr_rf.o sdr_stream.o
+ mt7921s-y := sdio.o sdio_mac.o sdio_mcu.o
+ mt7921u-y := usb.o
+--- a/drivers/net/wireless/mediatek/mt76/mt7921/mcu.c
++++ b/drivers/net/wireless/mediatek/mt76/mt7921/mcu.c
+@@ -351,6 +351,9 @@
+ {
+ 	struct mt76_connac2_mcu_rxd *rxd;
+ 
++	if (mt7921_sdr && mt7921_sdr_rx(skb))
++		return;
++
+ 	if (skb_linearize(skb))
+ 		return;
+ 
+--- a/drivers/net/wireless/mediatek/mt76/mt7921/mt7921.h
++++ b/drivers/net/wireless/mediatek/mt76/mt7921/mt7921.h
+@@ -6,6 +6,7 @@
+ 
+ #include "../mt792x.h"
+ #include "regs.h"
++#include "sdr.h"
+ 
+ #define MT7921_MAX_AID                  20
+ 
+--- a/drivers/net/wireless/mediatek/mt76/mt7921/pci.c
++++ b/drivers/net/wireless/mediatek/mt76/mt7921/pci.c
+@@ -193,6 +193,10 @@
+ 		layout.has_mcu_wa           = false;
+ 	}
+ 
++	/* SDR mode: an 8 KiB sample event spans 5 RX buffers, ~20k events/s at 40 MSps */
++	if (mt7921_sdr)
++		layout.mcu_rxdone_ring_size = 512;
++
+ 	mt76_dma_attach(&dev->mt76);
+ 
+ 	ret = mt792x_dma_disable(dev, true);
+@@ -452,6 +456,8 @@
+ 	if (of_property_read_bool(dev->mt76.dev->of_node, "wakeup-source"))
+ 		device_init_wakeup(dev->mt76.dev, false);
+ 
++	if (mt7921_sdr)	/* stop the stream before the host DMA rings go away */
++		mt7921e_sdr_shutdown(dev);
+ 	mt7921e_unregister_device(dev);
+ 	set_bit(MT76_REMOVED, &mdev->phy.state);
+ 	devm_free_irq(&pdev->dev, pdev->irq, dev);
+--- a/drivers/net/wireless/mediatek/mt76/mt7921/pci_mcu.c
++++ b/drivers/net/wireless/mediatek/mt76/mt7921/pci_mcu.c
+@@ -55,7 +55,7 @@
+ 
+ 	mt76_rmw_field(dev, MT_PCIE_MAC_PM, MT_PCIE_MAC_PM_L0S_DIS, 1);
+ 
+-	err = mt7921_run_firmware(dev);
++	err = mt7921_sdr ? mt7921e_sdr_boot(dev) : mt7921_run_firmware(dev);
+ 
+ 	mt76_queue_tx_cleanup(dev, dev->mt76.q_mcu[MT_MCUQ_FWDL], false);
+ 

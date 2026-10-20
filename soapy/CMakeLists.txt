@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.10)
+project(SoapyMT7922 CXX)
+find_package(SoapySDR CONFIG REQUIRED)
+SOAPY_SDR_MODULE_UTIL(TARGET mt7922Support SOURCES SoapyMT7922.cpp)
+target_include_directories(mt7922Support PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../driver)
