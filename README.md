@@ -10,6 +10,8 @@ the upstream `mt7921e` driver.
 
 Tested on a Framework Laptop 16 (AMD Ryzen 7040 Series) with Linux 7.2.
 
+https://github.com/user-attachments/assets/e588e4c8-e7f4-4daa-860c-82df044ef805
+
 | | |
 |:--|:--|
 | Band | 2.4 GHz, tunable 2390 to 2500 MHz |
