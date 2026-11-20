@@ -19,6 +19,8 @@ static int sdr_stream_start(struct mt7921_sdr *s, u32 rate, u64 hz)
 
 	if (s->streaming)
 		return -EBUSY;
+	if (s->mcu_dead)
+		return -EIO;	/* never arm the DMA and take the grant against a dead MCU */
 	ret = sdr_rf_rate(s, rate);
 	if (!ret && hz != s->hz)
 		ret = sdr_rf_tune(s, hz);
@@ -49,12 +51,32 @@ static int sdr_stream_stop(struct mt7921_sdr *s)
 
 	if (!s->streaming)
 		return 0;
+	if (s->mcu_dead) {
+		/* The mailbox is already known dead: retrying the naive stop against it is
+		 * exactly what wedged the card the first time. Skip it and let teardown
+		 * proceed; the card needs a power cycle, not more mailbox traffic. */
+		dev_err(dev->mt76.dev, "sdr: stop skipped: MCU dead (no retry against a dead mailbox)\n");
+		smp_store_release(&s->streaming, false);
+		wake_up_interruptible(&r->ring_wq);
+		return -EIO;
+	}
 	/* The MCU polls STOPREG between packets; SYSRAM is unreadable until it releases the grant. */
 	mt76_wr(dev, SDR_STOPREG, SDR_STOPMAGIC);
 	while (mt76_rr(dev, mb + SDR_MB_CANARY) != SDR_CANARY ||
 	       mt76_rr(dev, mb + SDR_MB_DONE) != s->done0 + 1) {
 		if (time_after(jiffies, timeout)) {
-			dev_err(dev->mt76.dev, "sdr: stream did not stop: grant may still be held\n");
+			/* Every firmware wait is bounded (<= 10 ms), so a stop that takes 3 s
+			 * means the MCU is unresponsive (bus wedged). Latch dead: no further
+			 * mailbox commands, no naive stop retry. A module reload does not
+			 * recover a wedged MCU (demonstrated) -- power cycle the card. */
+			s->mcu_dead = true;
+			smp_store_release(&s->streaming, false);
+			wake_up_interruptible(&r->ring_wq);
+			dev_err(dev->mt76.dev,
+				"sdr: stream did not stop: MCU unresponsive (grant may still be held); "
+				"mailbox dead -- no further mailbox commands or stop retries; "
+				"teardown proceeds, and a module reload will NOT recover the MCU: "
+				"power cycle the card to restore it\n");
 			return -EIO;
 		}
 		msleep(5);
@@ -160,6 +182,10 @@ static long sdr_fioctl(struct file *f, unsigned int cmd, unsigned long arg)
 		break;
 	case MT7921_SDR_GAIN:
 		/* PHY words need MCU ops, and the MCU is busy streaming: stop around them */
+		if (s->mcu_dead) {
+			ret = -EIO;	/* the gain PHY words go through the dead mailbox */
+			break;
+		}
 		if (copy_from_user(&g, uarg, sizeof(g))) {
 			ret = -EFAULT;
 			break;
@@ -243,6 +269,11 @@ void mt7921e_sdr_shutdown(struct mt792x_dev *dev)
 	misc_deregister(&s->misc);
 	mutex_lock(&s->lock);
 	sdr_stream_stop(s);
+	if (s->mcu_dead)
+		dev_err(dev->mt76.dev,
+			"sdr: teardown with the MCU dead: only host-reachable (A-die) registers are "
+			"restored; mailbox ops will fail fast; the ICAP grant may still be held and "
+			"a module reload cannot recover the MCU -- power cycle the card\n");
 	s->up = false;
 	ring = r->ring;
 	WRITE_ONCE(r->ring, NULL);

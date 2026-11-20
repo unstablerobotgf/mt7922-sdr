@@ -65,7 +65,7 @@ place the stock driver and Bluetooth return immediately after `sdr-down.sh`.
 | Symptom | Meaning | Action |
 |:--|:--|:--|
 | `rmmod` reports the module in use | `/dev/mt7921_sdr` is open | Close the application |
-| `stream did not stop: grant may still be held` | The program stopped answering during a stream | Teardown continues; MCU undo entries will fail. Reboot to be sure the A-die is clean |
+| `stream did not stop: MCU unresponsive (grant may still be held); mailbox dead` | The program stopped answering during a stream; the driver latched the MCU dead, so no further mailbox commands or stop retries are issued against it | Teardown continues; mailbox undo entries will fail. A module reload does not recover a wedged MCU: power cycle the card (reboot, or a PCIe power reset) to be sure the A-die is clean |
 | Undo reports failed entries | Some registers kept SDR values | A cold boot resets them |
 | `ROM patch present or semaphore busy` on `sdr-up.sh` | Vendor patch still resident | Run `sdr-down.sh` and `sdr-up.sh` again, or cold boot |
 | WiFi interface does not return | Stock firmware load failed | Check `dmesg`; a cold boot recovers |
