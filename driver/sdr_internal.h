@@ -55,6 +55,7 @@ struct mt7921_sdr {
 	struct mutex lock;		/* serialises ioctls, open and shutdown */
 	bool up, open, streaming;
 	u32 done0;			/* MB_DONE when the stream command was issued */
+	bool mcu_dead;			/* stop timed out: no mailbox commands, no naive stop retry */
 };
 
 /* sdr_mcu.c */

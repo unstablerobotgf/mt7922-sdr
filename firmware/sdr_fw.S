@@ -403,6 +403,26 @@ stream_drain:
     swi $r0, [$r8 + 40]
 stream_release:
     swi $r4, [$r8 + 60]       /* the ROM calls below clobber r0-r5 */
+    /* Bounded wait for an ICAP idle window before the disarm, so the single disarm at
+     * stream end does not land mid-burst: at 160 MSps the ring is full and the ICAP is
+     * continuously writing to it, and a cursor reset mid-write wedges the bus. 5 ms max;
+     * if the ICAP never idles, disarm anyway (the vendor's own release path). */
+    lwi $r1, [$r8 + 64]
+    beqz $r1, 58f
+    lwi $r0, [$r10]
+    swi $r0, [$r8 + 52]
+57:
+    load32 $r2, ICAP_BUSY
+    lwi $r2, [$r2]
+    jral5 $r2
+    beqz $r0, 58f
+    lwi $r1, [$r10]
+    lwi $r2, [$r8 + 52]
+    sub $r1, $r1, $r2
+    movi $r2, 5000
+    slt $r1, $r1, $r2
+    bnez $r1, 57b
+58:
     load32 $r1, ICAP_CR0
     movi $r0, 0x4f1           /* vendor leaves ICAP at 0x401 (EN kept) when it releases */
     swi $r0, [$r1]
