@@ -31,7 +31,7 @@ flowchart TD
     P -.->|"poll gap > guard<br/>or backlog > 60 Ki units"| G["Gap: drain DMA, gaps++, new epoch"]
     W -.-> G
     G --> E
-    R["Drain DMA, CR0 = 0x4f1 (EN kept)<br/>wait ROM ICAP status idle, hooks(0), release grant"] --> Z["Publish results at +0x340, MB_DONE++"]
+    R["Drain DMA, wait ROM ICAP status idle (5 ms bound),<br/>CR0 = 0x4f1 (EN kept), wait ROM status idle, hooks(0), release grant"] --> Z["Publish results at +0x340, MB_DONE++"]
 ```
 
 ### Flow control without a hardware read pointer
@@ -112,11 +112,17 @@ sequenceDiagram
     participant M as MCU (stream loop)
     H->>M: write 'STOP' to 0x54000120
     Note over M: checked once per packet
-    M->>M: drain DMA, CR0 = 0x4f1, ROM status idle, hooks(0), release grant
+    M->>M: drain DMA, ROM status idle (5 ms bound), CR0 = 0x4f1, ROM status idle, hooks(0), release grant
     M-->>H: results at +0x340, MB_DONE + 1
     H->>H: poll canary and MB_DONE every 5 ms (3 s limit)
     H->>H: clear STOPREG, mark stopped, wake readers
 ```
+
+Before the disarm, the program waits up to 5 ms for the ROM to report the ICAP idle (the
+same bound as the post-disarm status wait): at 160 MSps the ring is full and the ICAP is
+continuously writing to it, and a cursor reset that lands mid-burst wedges the MCU. If the
+ICAP never idles the wait times out and the disarm happens anyway, exactly the vendor's own
+release path.
 
 `0x54000120` is `MT_WFDMA_DUMMY_CR`, a scratch register in the DMA block. It is writable by
 the host and readable by the MCU while the grant is held, which SYSRAM is not.
