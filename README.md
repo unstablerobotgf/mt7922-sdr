@@ -91,7 +91,7 @@ firmware/
   sdr_fw.S             the MCU program (ops command, stream command)
   build_fw.py          assembler driver, PDA checksum, header generator
 soapy/                 SoapySDR module
-tools/                 build, up/down, end-to-end check
+tools/                 build, up/down, end-to-end check, ASPM helper
 docs/                  see below
 LICENSE                which licence covers which path
 LICENSES/              full texts: BSD-3-Clause-Clear, MIT
@@ -111,6 +111,13 @@ LICENSES/              full texts: BSD-3-Clause-Clear, MIT
 
 ## Status and limitations
 
+- 80 MSps needs PCIe ASPM L1 disabled. With the link allowed to drop into ASPM L1 between
+  the bursty 8 KiB DMA transfers, the L1 exit latency costs up to ~12 % of the 80 MSps rate
+  (10 s runs swing 88 % to ~100 % duty depending on the link state). Disable it for the
+  adapter and its root port before streaming at 80 MSps: `sudo tools/aspm-off.sh off`
+  (idempotent; `tools/aspm-off.sh status` to check). It clears only the ASPM enable bits in
+  the PCIe Link Control register of the MT7922 and its parent port, and touches nothing
+  else. The setting needs re-applying after a reboot.
 - 2.4 GHz only. The A-die state is replayed from vendor readbacks; 5 and 6 GHz need their
   own tables (the method is in [rf.md](docs/rf.md#where-the-tables-come-from)).
 - One chain (chain 0). One reader at a time.
